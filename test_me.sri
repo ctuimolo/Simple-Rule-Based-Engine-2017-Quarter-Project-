@@ -1,0 +1,63 @@
+#############################
+#  Initialize start facts   #
+#############################
+
+FACT Father(John,Sam)
+FACT Father(Sam, Bob)
+FACT Father(Sarah, Josh, Bob)
+FACT Father(Aqua, Kazuma)
+FACT Father(Bob,Moses)
+
+FACT Mother(Jesus, Moses, Abraham)
+FACT Mother(Yun Yun, Megumin)
+FACT Mother(Megumin, Aqua)
+FACT Mother(Megumin, Bob)
+
+# add duplicates which are ignored
+FACT Father(Aqua, Kazuma)
+FACT Father(Bob,Moses)
+FACT Mother(Megumin, Aqua)
+FACT Mother(Megumin, Bob)
+
+##############################
+#   Initialize start rules   #
+##############################
+
+RULE Parent($X,$Y):- OR Father($X,$Y) Mother($X,$Y)
+
+# These rules will not return inferences initially without "Parent" facts
+RULE Grandmother($X,$Y):- AND Mother($X,$Z) Parent($Z,$Y)
+RULE Grandfather($X,$Y):- AND Father($X,$Z) Parent($Z,$Y)
+
+##############################
+#    Demo INFERENCE insert   #
+##############################
+
+# Only completes "Parent" rules for now
+INFERENCE Grandmother($Grandparent,$Grandchild)
+INFERENCE Grandfather($Grandparent,$Grandchild)
+INFERENCE Parent($Parent,$Child)
+
+# Load Parents into new facts
+INFERENCE Parent($Parent,$Child) Parent
+
+# Retry look for Grandparents
+INFERENCE Grandmother($Grandparent,$Grandchild)
+INFERENCE Grandfather($Grandparent,$Grandchild)
+
+# Load grandparents as well
+INFERENCE Grandmother($Grandparent,$Grandchild) Grandma
+INFERENCE Grandfather($Grandparent,$Grandchild) Grandpa
+
+##################
+#    Demo DROP   #
+##################
+
+DROP Father
+DROP Grandfather
+
+####################################################
+#    DUMP the new KB and RB to "test_output.sri"   #
+####################################################
+
+DUMP test_output.sri
